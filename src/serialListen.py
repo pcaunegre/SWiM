@@ -10,9 +10,16 @@
 
 import serial
 
+from datetime import datetime
+
+
+now = datetime.now()
+dt_string = now.strftime("%H:%M")
+
+
 serial_port = '/dev/ttyACM0';
 baud_rate = 9600; #In arduino, Serial.begin(baud_rate)
-write_to_file_path = "/home/pascal/projects/SWiM/doc/output.txt";
+write_to_file_path = "/home/pascal/projects/SWiM/doc/output" + dt_string +".txt";
 
 output_file = open(write_to_file_path, "w+");
 ser = serial.Serial(serial_port, baud_rate)

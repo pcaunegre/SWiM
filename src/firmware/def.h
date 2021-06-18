@@ -2,6 +2,7 @@
 // debug mode
 
 #define DEBUG 1
+#define LCD   1  // enable output to a lcd display
 
 // cpu clock to reduce power 2mA@1Mhz / 14mA@48Mhz
 #define CPU_DIVISOR 48
