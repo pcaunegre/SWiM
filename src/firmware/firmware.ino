@@ -1,13 +1,16 @@
 /*
-
-Sigfox Wind Meter 
-based on Peet Bros. (PRO) anemometer
-
-Read the wind speed and direction interrupts from two input pins, compute wind
-Send through Sigfox
-
-Run on MKRFox1200
-
+* -- Software for Arduino MKRFox1200 --
+*
+*
+* Purpose: Sigfox Wind AnemoMeter based on Peet Bros. (PRO) anemometer
+*
+* Peet Bros device uses 2 reed contacts, one for speed, one for wind direction
+* This program reads the wind speed and direction interrupts from two input pins, compute wind
+* and sends data through Sigfox
+*
+*
+* Pascal Caunegre. pascal.caunegre@gmail.com
+*
 */
 
 
@@ -20,10 +23,10 @@ Run on MKRFox1200
 volatile unsigned long  timeOffset    ;       // offset of millis time to limit size of times variables
 
 volatile unsigned long  speedLastPulseT  ;    // last time in millis the speed sensor triggers
-volatile int            speedTimeArray[100];  // array to store times of speed sensor pulses
+volatile int            speedTimeArray[ARRAYLEN];  // array to store times of speed sensor pulses
 volatile int            speedHitCnt;          // counter of speed pulses
 volatile unsigned long  dirLastPulseT  ;      // last time in millis the dir sensor triggers
-volatile int            dirTimeArray[100];    // array to store times of dir sensor pulses
+volatile int            dirTimeArray[ARRAYLEN];    // array to store times of dir sensor pulses
 volatile int            dirHitCnt;            // counter of dir pulses
 volatile unsigned long  last_sampleT  ;       // last time in millis a measure sampling has been done
 volatile unsigned long  last_reportT  ;       // last time in millis a sigfox telegram has been sent
@@ -36,12 +39,14 @@ volatile int            acc_wspeed    ;  // wind speed accumulator to compute av
 volatile float          acc_wdX       ;  // accumulate wind dir projection on X axis (cos)
 volatile float          acc_wdY       ;  // accumulate wind dir projection on X axis (sin)
 volatile int            prevWindDir   ;  // memorize the last dir in case we cannot compute new one (speed too low)
+volatile int            statReportCnt ;  // counter : every 2 hits data are sent thru sigfox 
 
 volatile int            lognbr        ;  // number of logs
 volatile bool           debugmode     ;  // 1=debug mode
 volatile bool           lcd_en        ;  // lcd plugged or not
+volatile SigfoxWindMessage msg        ;  // create struct to receive pair of wind data
 
-//
+// optional display that can be plugged to read values
 LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 
 void setup() {
@@ -50,36 +55,43 @@ void setup() {
   pinMode(pinSpeed, INPUT); // yellow wire of Peet Bros cable
   pinMode(pinDir  , INPUT); // green  wire
   
-  // install interruptions functions
-  attachInterrupt(digitalPinToInterrupt(pinSpeed), isr_speed    , FALLING);
-  attachInterrupt(digitalPinToInterrupt(pinDir)  , isr_direction, FALLING);
-  
   // init variables
   speedLastPulseT  = 0;
   dirLastPulseT    = 0;
   speedHitCnt      = 0;
   dirHitCnt        = 0;
+  statReportCnt    = 0;
   clearArrays();
-  lognbr           = 0;
   reset_stat();  
   prevWindDir      = -1;
   timeOffset       = millis();
   debugmode        = DEBUG;
   lcd_en           = LCD;
+  lognbr           = 0;
   
   // in debug mode we send back logs to the PC in Arduino IDE via Serial
   if(debugmode) {
     pinMode(Led, OUTPUT);
     digitalWrite(Led,HIGH); // blinks when starting in debug mode
     blinkLed(3,800);
-    lcd.begin(16,2);        // used when LCD is plugged for reading the device
-    lcd.print("Starting");
+    if (lcd_en) { 
+      lcd.begin(16,2);        // used when LCD is plugged for reading the device
+      lcd.clear();
+      lcd.print("Starting 1");
+    }
     Serial.begin(9600);     // 115200
-    while(!Serial) {};
-    lcd.clear();
-    lcd.print("SWiM started 2000");    
-    Serial.println("SWiM started 2000");
+    int waiting=0;
+    while(!Serial && waiting<5) {delay(1000); waiting++;}
+    if (lcd_en) { 
+      lcd.clear();
+      lcd.print("SWiM started 2001");
+    }
+    if (Serial) Serial.println("SWiM started 2001");
   }
+  
+  // install interruptions functions
+  attachInterrupt(digitalPinToInterrupt(pinSpeed), isr_speed    , FALLING);
+  attachInterrupt(digitalPinToInterrupt(pinDir)  , isr_direction, FALLING);
   // slowing down to 1MHz
 //  cpu_speed(CPU_DIVISOR);
 
@@ -106,7 +118,7 @@ void loop() {
     ws = computeWindSpeed();
     wd = computeWindDir();
     store_for_stat(ws,wd);
-    DebugLogMeas(ws,wd);
+    DebugLogMeas(ws,wd); // only for reading through lcd display or via usb
 //    printArrays();   // debug purpose
     resetSampler();
     interrupts();
@@ -114,19 +126,35 @@ void loop() {
     
   }
 
-  if (dt2 > REPORT_PERIOD) {
+  // at every sigfox report period we send 2 packets of data
+  // so at every half-report period we store data
+  if (dt2 > REPORT_PERIOD/2) {
     last_reportT = now;
     // report the values
     ws = wspeed_avg();
     wd = wdir_avg();
     
-    DebugLogAvgMeas(ws,wd);
-
-    // send sigfox telegram
+    // store in msg structure 
+    msg.speedMin[statReportCnt]     = encodeWindSpeed(min_wspeed);
+    msg.speedAvg[statReportCnt]     = encodeWindSpeed(ws);
+    msg.speedMax[statReportCnt]     = encodeWindSpeed(max_wspeed);
+    msg.directionAvg[statReportCnt] = encodeWindDirection(wd);
     
+    DebugLogAvgMeas(ws,wd); // only for reading through lcd display or via usb 
+
+    if (statReportCnt==1) {
+      // send sigfox telegram
+      
+      DebugSimSigfoxSend();
+      
+      statReportCnt=0;
+    } else {
+      statReportCnt=1;
+    }
     
     // clear stats
     reset_stat();
+    
   }
 
 
@@ -201,10 +229,6 @@ int computeWindSpeed() {
   // not enough pulses to compute wind
   if (speedHitCnt<2) return(0.0);
   
-// Serial.print("speedHitCnt  ");
-// Serial.print(speedHitCnt);
-// Serial.println("");
-
   // rotation per seconds
   int dt = speedTimeArray[speedHitCnt-1]-speedTimeArray[0];
   float rps = 1000.0 * (float)(speedHitCnt-1) / (float)dt;
