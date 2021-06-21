@@ -8,6 +8,8 @@
 * This program reads the wind speed and direction interrupts from two input pins, compute wind
 * and sends data through Sigfox
 *
+* Sometimes it is difficult to upload the code to this board (ACM port does not open). 
+* So, press quickly 2 times the reset button to reset the bootloader
 *
 * Pascal Caunegre. pascal.caunegre@gmail.com
 *
@@ -19,6 +21,8 @@
 #include <math.h> 
 #include "def.h"
 #include <LiquidCrystal.h>
+#include "ArduinoLowPower.h"
+
 
 volatile unsigned long  timeOffset    ;       // offset of millis time to limit size of times variables
 
@@ -112,57 +116,82 @@ void loop() {
 
   // if it's time to sample, get measures and store for stats
   if (dt1 > SAMPLING_PERIOD) {
-    noInterrupts();
-    timeOffset = millis();
-    last_sampleT = now;
-    ws = computeWindSpeed();
-    wd = computeWindDir();
-    store_for_stat(ws,wd);
-    DebugLogMeas(ws,wd); // only for reading through lcd display or via usb
-//    printArrays();   // debug purpose
-    resetSampler();
-    interrupts();
-    blinkLed(2,100); // debug purpose
-    
+    takeSample();
   }
 
   // at every sigfox report period we send 2 packets of data
   // so at every half-report period we store data
   if (dt2 > REPORT_PERIOD/2) {
-    last_reportT = now;
-    // report the values
-    ws = wspeed_avg();
-    wd = wdir_avg();
-    
-    // store in msg structure 
-    msg.speedMin[statReportCnt]     = encodeWindSpeed(min_wspeed);
-    msg.speedAvg[statReportCnt]     = encodeWindSpeed(ws);
-    msg.speedMax[statReportCnt]     = encodeWindSpeed(max_wspeed);
-    msg.directionAvg[statReportCnt] = encodeWindDirection(wd);
-    
-    DebugLogAvgMeas(ws,wd); // only for reading through lcd display or via usb 
-
-    if (statReportCnt==1) {
-      // send sigfox telegram
-      
-      DebugSimSigfoxSend();
-      
-      statReportCnt=0;
-    } else {
-      statReportCnt=1;
-    }
-    
-    // clear stats
-    reset_stat();
-    
+    makeReport();
   }
 
 
 
 }
+/*
+ * Take sample
+ * capture one measure point
+ *
+*/
+void takeSample() {
+  
+  unsigned long now = millis();
+  int ws, wd;
+  
+  last_sampleT = now;
+  noInterrupts();
+  timeOffset = now;
+  ws = computeWindSpeed();
+  wd = computeWindDir();
+  store_for_stat(ws,wd);
+  DebugLogMeas(ws,wd); // only for reading through lcd display or via usb
+//  printArrays();   // debug purpose
+  resetSampler();
+  interrupts();
+  blinkLed(2,100); // debug purpose
+    
+}
+/*
+ * compute measure stat and prepare and send report to sigfox module
+ * 
+ *
+*/
+void makeReport() {
+  
+  unsigned long now = millis();
+  int ws, wd;
+  
+  last_reportT = now;
+    
+  // report the values
+  ws = wspeed_avg();
+  wd = wdir_avg();
+  
+  // store in msg structure 
+  msg.speedMin[statReportCnt]     = encodeWindSpeed(min_wspeed);
+  msg.speedAvg[statReportCnt]     = encodeWindSpeed(ws);
+  msg.speedMax[statReportCnt]     = encodeWindSpeed(max_wspeed);
+  msg.directionAvg[statReportCnt] = encodeWindDirection(wd);
+  
+  DebugLogAvgMeas(ws,wd); // only for reading through lcd display or via usb 
+
+  if (statReportCnt==1) {
+    // send sigfox telegram
+    
+    DebugSimSigfoxSend();
+    
+    statReportCnt=0;
+  } else {
+    statReportCnt=1;
+  }
+  
+  // clear stats
+  reset_stat();
+ 
+}
 
 /*
- * Interrupt called when the rotating part of the wind instrument
+ * Interrupt routine called when the rotating part of the wind instrument
  * has completed one rotation. Rising edge.
  *
 */
@@ -179,7 +208,7 @@ void isr_speed() {
 
 }
 /*
- * Interrupt called when the direction reed sensor triggers. Rising edge.
+ * Interrupt routine called when the direction reed sensor triggers. Rising edge.
  *
 */
 void isr_direction() {
@@ -275,11 +304,11 @@ int computeWindDir() {
   return(wdir);
 }
 
-// /*
-//  * Accessory to search in the Dir pulse times array
-//  * a value between LL and UL
-//  * 
-// */
+/*
+ * Accessory to search in the Dir pulse times array
+ * a value between LL and UL
+ * 
+*/
 int searchElem(int LL, int UL) {
 
   for (int i=0; i<dirHitCnt; i++ ) {
@@ -321,7 +350,7 @@ void store_for_stat(int ws, int wd)  {
 */
 void reset_stat()  {
   max_wspeed    = 0  ;
-  min_wspeed    = 1000;
+  min_wspeed    = 999;
   acc_wspeed    = 0  ;
   cnt_ws_samples= 0  ;
   cnt_wd_samples= 0  ;
@@ -378,8 +407,3 @@ void reboot() {
   while (1);
 }
 
-void cpu_speed(int divisor){
-  GCLK->GENDIV.reg = GCLK_GENDIV_DIV(divisor) |         // Divide the 48MHz clock source by divisor 48: 48MHz/48=1MHz
-                   GCLK_GENDIV_ID(0);            // Select Generic Clock (GCLK) 0
-  while (GCLK->STATUS.bit.SYNCBUSY);               // Wait for synchronization      
-}

@@ -5,15 +5,11 @@
 #define DEBUG 1
 #define LCD   1  // enable output to a lcd display
 
-// cpu clock to reduce power 2mA@1Mhz / 14mA@48Mhz
-#define CPU_DIVISOR 48
-#define FULL 1
 
 
 // Wind Speed & Direction
 // use 2 of interruptible pins among: 0, 1, 4, 5, 6, 7, 8, A1 -or 16-, A2 - or 17
 #define pinSpeed  7     // reed sensor for speed     - yellow wire
-
 #define pinDir    8     // reed sensor for direction - green wire
 
 
@@ -43,7 +39,7 @@
 * Numbers are arranged to fit into 8 bytes
 */
 
-//  pour transmettre 2 périodes / message :
+//  pour transmettre 2 pï¿½riodes / message :
 // message de 8 bytes
 typedef struct __attribute__ ((packed)) sigfox_wind_message {
         int8_t speedMin[2];
@@ -80,8 +76,7 @@ uint8_t encodeWindSpeed (float speedKmh) {
 // here direction is 0-359 degrees (not like in Pioupiou)
 uint8_t encodeWindDirection (int direction) { // degrees
 
-  // encode with 2° precision
+  // encode with 2ï¿½ precision
   // add 0.5 for rounding when converting from (float) to (int)
   return (uint8_t)(float)(direction / 2. + 0.5);
 }
-
