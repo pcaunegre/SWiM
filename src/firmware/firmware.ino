@@ -75,29 +75,16 @@ void setup() {
   
   // in debug mode we send back logs to the PC in Arduino IDE via Serial
   if(debugmode) {
-    pinMode(Led, OUTPUT);
-    digitalWrite(Led,HIGH); // blinks when starting in debug mode
-    blinkLed(3,800);
-    if (lcd_en) { 
-      lcd.begin(16,2);        // used when LCD is plugged for reading the device
-      lcd.clear();
-      lcd.print("Starting 1");
-    }
-    Serial.begin(9600);     // 115200
-    int waiting=0;
-    while(!Serial && waiting<5) {delay(1000); waiting++;}
-    if (lcd_en) { 
-      lcd.clear();
-      lcd.print("SWiM started 2001");
-    }
-    if (Serial) Serial.println("SWiM started 2001");
+    DebugInit();
   }
   
   // install interruptions functions
   attachInterrupt(digitalPinToInterrupt(pinSpeed), isr_speed    , FALLING);
   attachInterrupt(digitalPinToInterrupt(pinDir)  , isr_direction, FALLING);
-  // slowing down to 1MHz
-//  cpu_speed(CPU_DIVISOR);
+  
+// install interruptions functions of the lowpower lib
+//   LowPower.attachInterruptWakeup(digitalPinToInterrupt(pinSpeed), isr_speed    , FALLING);
+//   LowPower.attachInterruptWakeup(digitalPinToInterrupt(pinDir)  , isr_direction, FALLING);
 
 }
 
@@ -105,15 +92,11 @@ void setup() {
 void loop() {
 
   unsigned long now = millis();
-  int    dt1;  // ellapsed time since last sample
-  int    dt2;  // ellapsed time since last report
-  int    ws;   // temporary wind speed
-  int    wd;   // temporary wind dir angle
-  
-  if (now > 2419200) reboot(); // every 28 days to avoid managing millis reset after 2**32-1 ms
-  dt1 = now - last_sampleT;
-  dt2 = now - last_reportT;
+  int    dt1 = now - last_sampleT;  // ellapsed time since last sample
+  int    dt2 = now - last_reportT;  // ellapsed time since last report  
 
+//   LowPower.sleep(SAMPLING_PERIOD); // let micro sleep to save power
+  
   // if it's time to sample, get measures and store for stats
   if (dt1 > SAMPLING_PERIOD) {
     takeSample();
@@ -125,7 +108,7 @@ void loop() {
     makeReport();
   }
 
-
+  if (now > REBOOT_PERIOD) reboot(); // avoid managing millis value wrapping (every 2**32-1 ms)
 
 }
 /*

@@ -19,6 +19,29 @@ void blinkLed(int times, int period) {
  
 }
 
+/*
+ * Accessory to log infos at init when in debug mode 
+*/
+void DebugInit( ) {
+    
+    pinMode(Led, OUTPUT);
+    digitalWrite(Led,HIGH); // blinks when starting in debug mode
+    blinkLed(3,800);
+    if (lcd_en) { 
+      lcd.begin(16,2);        // used when LCD is plugged for reading the device
+      lcd.clear();
+      lcd.print("Starting 2");
+    }
+    Serial.begin(9600);     // 115200
+    int waiting=0;
+    while(!Serial && waiting<5) {delay(1000); waiting++;}
+    if (lcd_en) { 
+      lcd.clear();
+      lcd.print("SWiM started 2001");
+    }
+    if (Serial) Serial.println("SWiM started 2001");
+
+}
 
 /*
  * Accessory to log data via Serial when in debug mode

@@ -1,7 +1,7 @@
 #define SOFTVERSION 210620
 
 
-// debug facility
+// debug facilities
 #define DEBUG 1
 #define LCD   1  // enable output to a lcd display
 
@@ -14,33 +14,29 @@
 
 
 // 
-#define DEBOUNCE_TIME   25    // 25ms correspond to speed 155km/h (40rps)
+#define DEBOUNCE_TIME   25       // 25ms correspond to speed 155km/h (40rps), can be less.
 
-#define ARRAYLEN        99    // size of an array to store pulses (40rps gives 120 values in 3s)
+#define ARRAYLEN        99       // size of an array to store pulses (40rps gives 120 values in 3s)
 
-#define SAMPLING_PERIOD 3000  // instantaneous wind is measured on a period of 3s (common rule)
+#define SAMPLING_PERIOD 3000     // instantaneous wind is measured on a period of 3s (common rule)
+#define REBOOT_PERIOD   2419200  // reboot micro every 28 days to avoid managing millis reset after 2**32-1 ms
 
-// in production, report period is 10min=600s (both the period to avg the wind speed and the sigfox report period)
-// #define REPORT_PERIOD 600000  //
+// #define REPORT_PERIOD 600000  // in production, report period is 10min=600s (both the period to avg the wind speed and the sigfox report period)
 
-// shorter time for debug: 1min
-#define REPORT_PERIOD 60000  
+#define REPORT_PERIOD 60000 // shorter time for debug: 1min  
 
 #define Led LED_BUILTIN 
 
 
-// 3.2rps = 13km/h, 0.24rps = 1km/h, 1rps=4km/h mini detectable
+// Reminder: 3.2rps = 13km/h, 0.24rps = 1km/h, 1rps=4km/h mini detectable
 
 
 
 /*
 * This part of code is about packing data to comply with expected format by OpenWindMap
 *
-* Numbers are arranged to fit into 8 bytes
+* Numbers are arranged to fit into 8 bytes (2 periods, 4 data)
 */
-
-//  pour transmettre 2 p�riodes / message :
-// message de 8 bytes
 typedef struct __attribute__ ((packed)) sigfox_wind_message {
         int8_t speedMin[2];
         int8_t speedAvg[2];
@@ -74,7 +70,7 @@ uint8_t encodeWindSpeed (float speedKmh) {
 
 // wind direction encoding over 1 byte
 // here direction is 0-359 degrees (not like in Pioupiou)
-uint8_t encodeWindDirection (int direction) { // degrees
+uint8_t encodeWindDirection (int direction) {   // degrees
 
   // encode with 2� precision
   // add 0.5 for rounding when converting from (float) to (int)
