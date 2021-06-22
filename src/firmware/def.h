@@ -5,6 +5,8 @@
 #define DEBUG 1
 #define LCD   1  // enable output to a lcd display
 
+#define CPU_FULL   1  // normal cpu rate (48Mhz)
+#define CPU_SLOW   8  // divided by 8 so 6Mhz for power saving
 
 
 // Wind Speed & Direction
@@ -72,7 +74,7 @@ uint8_t encodeWindSpeed (float speedKmh) {
 // here direction is 0-359 degrees (not like in Pioupiou)
 uint8_t encodeWindDirection (int direction) {   // degrees
 
-  // encode with 2� precision
+  // encode with 2 deg precision
   // add 0.5 for rounding when converting from (float) to (int)
   return (uint8_t)(float)(direction / 2. + 0.5);
 }

@@ -26,20 +26,20 @@ void DebugInit( ) {
     
     pinMode(Led, OUTPUT);
     digitalWrite(Led,HIGH); // blinks when starting in debug mode
-    blinkLed(3,800);
+    blinkLed(3,800/CPU_SLOW);
     if (lcd_en) { 
       lcd.begin(16,2);        // used when LCD is plugged for reading the device
       lcd.clear();
-      lcd.print("Starting 2");
+      lcd.print("Starting 4");
     }
     Serial.begin(9600);     // 115200
     int waiting=0;
     while(!Serial && waiting<5) {delay(1000); waiting++;}
     if (lcd_en) { 
       lcd.clear();
-      lcd.print("SWiM started 2001");
+      lcd.print("SWiM started 2002");
     }
-    if (Serial) Serial.println("SWiM started 2001");
+    if (Serial) Serial.println("SWiM started 2002");
 
 }
 
@@ -69,8 +69,9 @@ void DebugLogMeas(int ws, int wd) {
     lcd.setCursor(0,0);
     lcd.print("                ");
     lcd.setCursor(0,0);
-    lcd.print("V=");lcd.print(ws);lcd.print(" ");
-    lcd.print("Dir=");lcd.print(deg2dir(wd));
+    lcd.print(lognbr);lcd.print(" ");
+    lcd.print("Vi=")  ;lcd.print(ws);lcd.print(" ");
+    lcd.print("Di=");lcd.print(deg2dir(wd));
   }
 }
 
@@ -100,8 +101,9 @@ void DebugLogAvgMeas(int ws, int wd) {
     lcd.setCursor(0,1);
     lcd.print("                ");
     lcd.setCursor(0,1);
-    lcd.print("Vmoy=");lcd.print(ws);lcd.print(" ");
-    lcd.print("DMoy=");lcd.print(deg2dir(wd));
+    lcd.print(lognbr);lcd.print(" ");
+    lcd.print("Vm=");lcd.print(ws);lcd.print(" ");
+    lcd.print("Dm=");lcd.print(deg2dir(wd));
   }
 }
 

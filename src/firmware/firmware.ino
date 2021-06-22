@@ -8,8 +8,7 @@
 * This program reads the wind speed and direction interrupts from two input pins, compute wind
 * and sends data through Sigfox
 *
-* Sometimes it is difficult to upload the code to this board (ACM port does not open). 
-* So, press quickly 2 times the reset button to reset the bootloader
+* To upload the code onto this board  quickly press 2 times the reset button to reset the bootloader
 *
 * Pascal Caunegre. pascal.caunegre@gmail.com
 *
@@ -21,7 +20,6 @@
 #include <math.h> 
 #include "def.h"
 #include <LiquidCrystal.h>
-#include "ArduinoLowPower.h"
 
 
 volatile unsigned long  timeOffset    ;       // offset of millis time to limit size of times variables
@@ -82,10 +80,7 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(pinSpeed), isr_speed    , FALLING);
   attachInterrupt(digitalPinToInterrupt(pinDir)  , isr_direction, FALLING);
   
-// install interruptions functions of the lowpower lib
-//   LowPower.attachInterruptWakeup(digitalPinToInterrupt(pinSpeed), isr_speed    , FALLING);
-//   LowPower.attachInterruptWakeup(digitalPinToInterrupt(pinDir)  , isr_direction, FALLING);
-
+  cpu_speed(CPU_SLOW);
 }
 
 
@@ -94,23 +89,23 @@ void loop() {
   unsigned long now = millis();
   int    dt1 = now - last_sampleT;  // ellapsed time since last sample
   int    dt2 = now - last_reportT;  // ellapsed time since last report  
-
-//   LowPower.sleep(SAMPLING_PERIOD); // let micro sleep to save power
   
   // if it's time to sample, get measures and store for stats
-  if (dt1 > SAMPLING_PERIOD) {
+  if (dt1 > SAMPLING_PERIOD/CPU_SLOW) {
     takeSample();
   }
 
   // at every sigfox report period we send 2 packets of data
   // so at every half-report period we store data
-  if (dt2 > REPORT_PERIOD/2) {
+  if (dt2 > (REPORT_PERIOD/2)/CPU_SLOW) {
     makeReport();
   }
 
-  if (now > REBOOT_PERIOD) reboot(); // avoid managing millis value wrapping (every 2**32-1 ms)
+  if (now > REBOOT_PERIOD/CPU_SLOW) reboot(); // avoid managing millis value wrapping (every 2**32-1 ms)
+
 
 }
+
 /*
  * Take sample
  * capture one measure point
@@ -163,6 +158,11 @@ void makeReport() {
     
     DebugSimSigfoxSend();
     
+    // Sigfox call, will require normal cpu rate
+    // cpu_speed(CPU_FULL)
+    // ...sigfox stuff
+    // cpu_speed(CPU_SLOW)
+    
     statReportCnt=0;
   } else {
     statReportCnt=1;
@@ -182,7 +182,7 @@ void isr_speed() {
   int now = millis();
   
   // avoid switch bounce to call this routine multiple times
-  if ((now - speedLastPulseT) < DEBOUNCE_TIME) {
+  if ((now - speedLastPulseT) < DEBOUNCE_TIME/CPU_SLOW) {
     return;
   }
   speedLastPulseT = now; 
@@ -198,7 +198,7 @@ void isr_direction() {
   int now = millis();
   
   // avoid switch bounce to call this routine multiple times
-  if ((now - dirLastPulseT) < DEBOUNCE_TIME) {
+  if ((now - dirLastPulseT) < DEBOUNCE_TIME/CPU_SLOW) {
     return;
   }
   dirLastPulseT = now;   
@@ -242,7 +242,7 @@ int computeWindSpeed() {
   if (speedHitCnt<2) return(0.0);
   
   // rotation per seconds
-  int dt = speedTimeArray[speedHitCnt-1]-speedTimeArray[0];
+  int dt = (speedTimeArray[speedHitCnt-1]-speedTimeArray[0])*CPU_SLOW;
   float rps = 1000.0 * (float)(speedHitCnt-1) / (float)dt;
   
   // calibration formulas given by Peet Bros sensor vendor
@@ -390,3 +390,11 @@ void reboot() {
   while (1);
 }
 
+/*
+ * CPU underclocking: clock is divided by divisor
+*/
+void cpu_speed(int divisor){
+  GCLK->GENDIV.reg = GCLK_GENDIV_DIV(divisor) |         // Divide the 48MHz clock source by divisor 48: 48MHz/48=1MHz
+                   GCLK_GENDIV_ID(0);            // Select Generic Clock (GCLK) 0
+  while (GCLK->STATUS.bit.SYNCBUSY);               // Wait for synchronization      
+}
