@@ -44,6 +44,7 @@ volatile int            prevWindDir   ;  // memorize the last dir in case we can
 volatile int            statReportCnt ;  // counter : every 2 hits data are sent thru sigfox 
 
 volatile int            lognbr        ;  // number of logs
+volatile int            repnbr        ;  // number of logs
 volatile bool           debugmode     ;  // 1=debug mode
 volatile bool           lcd_en        ;  // lcd plugged or not
 volatile SigfoxWindMessage msg        ;  // create struct to receive pair of wind data
@@ -70,11 +71,10 @@ void setup() {
   debugmode        = DEBUG;
   lcd_en           = LCD;
   lognbr           = 0;
+  repnbr           = 0;
   
   // in debug mode we send back logs to the PC in Arduino IDE via Serial
-  if(debugmode) {
-    DebugInit();
-  }
+  DebugInit();
   
   // install interruptions functions
   attachInterrupt(digitalPinToInterrupt(pinSpeed), isr_speed    , FALLING);
@@ -366,20 +366,6 @@ int wdir_avg()  {
 }
 
 
-/*
- * Accessory to convert wind angle into N, S, W... directions
-*/
-String deg2dir(int wd) {
-    if      (wd <22)  return(String("N"));
-    else if (wd <67)  return(String("NE"));
-    else if (wd <112) return(String("E"));
-    else if (wd <157) return(String("SE"));
-    else if (wd <202) return(String("S"));
-    else if (wd <247) return(String("SW"));
-    else if (wd <292) return(String("W"));
-    else if (wd <337) return(String("NW"));
-    else              return(String("N"));    
-}
 
 
 /*

@@ -2,11 +2,11 @@
 
 
 // debug facilities
-#define DEBUG 1
+#define DEBUG 0
 #define LCD   1  // enable output to a lcd display
 
 #define CPU_FULL   1  // normal cpu rate (48Mhz)
-#define CPU_SLOW   8  // divided by 8 so 6Mhz for power saving
+#define CPU_SLOW   16  // divided by 16 so 3Mhz for power saving
 
 
 // Wind Speed & Direction
@@ -16,11 +16,11 @@
 
 
 // 
-#define DEBOUNCE_TIME   25       // 25ms correspond to speed 155km/h (40rps), can be less.
+#define DEBOUNCE_TIME   16       // 16ms (25ms correspond to speed 155km/h=40rps)
 
 #define ARRAYLEN        99       // size of an array to store pulses (40rps gives 120 values in 3s)
 
-#define SAMPLING_PERIOD 3000     // instantaneous wind is measured on a period of 3s (common rule)
+#define SAMPLING_PERIOD 2992     // instantaneous wind is measured on a period of 3s (common rule)
 #define REBOOT_PERIOD   2419200  // reboot micro every 28 days to avoid managing millis reset after 2**32-1 ms
 
 // #define REPORT_PERIOD 600000  // in production, report period is 10min=600s (both the period to avg the wind speed and the sigfox report period)
