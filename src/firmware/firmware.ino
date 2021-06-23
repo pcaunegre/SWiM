@@ -3,12 +3,13 @@
 *
 *
 * Purpose: Sigfox Wind AnemoMeter based on Peet Bros. (PRO) anemometer
+*          sending data to the OpenWindMap network via Sigfox
 *
 * Peet Bros device uses 2 reed contacts, one for speed, one for wind direction
 * This program reads the wind speed and direction interrupts from two input pins, compute wind
 * and sends data through Sigfox
 *
-* To upload the code onto this board  quickly press 2 times the reset button to reset the bootloader
+* To upload the code onto this board quickly press 2 times the reset button to reset the bootloader
 *
 * Pascal Caunegre. pascal.caunegre@gmail.com
 *
@@ -49,7 +50,7 @@ volatile bool           debugmode     ;  // 1=debug mode
 volatile bool           lcd_en        ;  // lcd plugged or not
 volatile SigfoxWindMessage msg        ;  // create struct to receive pair of wind data
 
-// optional display that can be plugged to read values
+// optional display that can be plugged to read values during installation
 LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 
 void setup() {
@@ -145,7 +146,7 @@ void makeReport() {
   ws = wspeed_avg();
   wd = wdir_avg();
   
-  // store in msg structure 
+  // store in msg structure with OpenWindMap-expected data encoding
   msg.speedMin[statReportCnt]     = encodeWindSpeed(min_wspeed);
   msg.speedAvg[statReportCnt]     = encodeWindSpeed(ws);
   msg.speedMax[statReportCnt]     = encodeWindSpeed(max_wspeed);
@@ -153,6 +154,7 @@ void makeReport() {
   
   DebugLogAvgMeas(ws,wd); // only for reading through lcd display or via usb 
 
+  // we send telegram half the time
   if (statReportCnt==1) {
     // send sigfox telegram
     
@@ -174,8 +176,8 @@ void makeReport() {
 }
 
 /*
- * Interrupt routine called when the rotating part of the wind instrument
- * has completed one rotation. Rising edge.
+ * Interrupt service routine called when the rotating part of the wind instrument
+ * has completed one rotation.
  *
 */
 void isr_speed() {
@@ -191,7 +193,7 @@ void isr_speed() {
 
 }
 /*
- * Interrupt routine called when the direction reed sensor triggers. Rising edge.
+ * Interrupt service routine called when the direction reed sensor triggers.
  *
 */
 void isr_direction() {
@@ -253,7 +255,7 @@ int computeWindSpeed() {
   // useless: the sensor will be destroyed before this wind speed !
   //else if (rps < 66.332) mph =  0.1104*rps*rps - 9.5685*rps + 329.87;
   
-  int kmh = int(mph * 1.609344);  
+  int kmh = int(mph * 1.609344);  // be aware the sensor doc is wrong on that conversion !
   return(kmh);
 }
 
