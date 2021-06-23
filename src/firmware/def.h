@@ -35,9 +35,12 @@
 
 
 /*
-* This part of code is about packing data to comply with expected format by OpenWindMap
+* This part of code is about packing data to comply with the format expected by OpenWindMap
 *
 * Numbers are arranged to fit into 8 bytes (2 periods, 4 data)
+* xxx[0] -> data from T-10 to T-5 min
+* xxx[1] -> data from T-5 min to T
+* T being the time of emission
 */
 typedef struct __attribute__ ((packed)) sigfox_wind_message {
         int8_t speedMin[2];
@@ -71,7 +74,7 @@ uint8_t encodeWindSpeed (float speedKmh) {
 }
 
 // wind direction encoding over 1 byte
-// here direction is 0-359 degrees (not like in Pioupiou)
+// here direction comes 0-359 degrees (not like in Pioupiou)
 uint8_t encodeWindDirection (int direction) {   // degrees
 
   // encode with 2 deg precision

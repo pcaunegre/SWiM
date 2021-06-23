@@ -48,7 +48,7 @@ volatile int            lognbr        ;  // number of logs
 volatile int            repnbr        ;  // number of logs
 volatile bool           debugmode     ;  // 1=debug mode
 volatile bool           lcd_en        ;  // lcd plugged or not
-volatile SigfoxWindMessage msg        ;  // create struct to receive pair of wind data
+volatile SigfoxWindMessage msg        ;  // create an instance of the struct to receive the wind data frame
 
 // optional display that can be plugged to read values during installation
 LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
@@ -161,9 +161,11 @@ void makeReport() {
     DebugSimSigfoxSend();
     
     // Sigfox call, will require normal cpu rate
-    // cpu_speed(CPU_FULL)
-    // ...sigfox stuff
-    // cpu_speed(CPU_SLOW)
+//     noInterrupts();
+//     cpu_speed(CPU_FULL);
+//     sendSigFoxMessage();
+//     cpu_speed(CPU_SLOW);
+//     interrupts();
     
     statReportCnt=0;
   } else {
@@ -368,6 +370,33 @@ int wdir_avg()  {
 }
 
 
+/*
+ * functions dedicated to Sigfox message sending
+ * 
+ *speedMin[0], speedMin[1], speedAvg[0], speedAvg[1], speedMax[0], speedMax[1], dirAvg[0], dirAvg[1]
+*/
+void sendSigFoxMessage() {
+  // Start the module
+  delay(10);
+  SigFox.begin();
+//   if (!SigFox.begin()) {
+//     Serial.println("SigFox error, rebooting");
+//     reboot();
+//   }
+  // Wait at least 30mS after first configuration (100mS before)
+  delay(100);
+
+  // Clears all pending interrupts
+  SigFox.status();
+  delay(1);
+  SigFox.beginPacket();
+  
+  // OpenWindMap specific data frame  
+  SigFox.write((uint8_t*)&msg, sizeof(SigfoxWindMessage));
+  
+  int ret = SigFox.endPacket();
+  SigFox.end();
+}
 
 
 /*
