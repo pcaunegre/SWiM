@@ -3,7 +3,7 @@
 
 // debug facilities
 #define DEBUG 0
-#define LCD   1  // enable output to a lcd display
+#define LCD   0  // enable output to a lcd display
 
 #define CPU_FULL   1  // normal cpu rate (48Mhz)
 #define CPU_SLOW   16  // divided by 16 so 3Mhz for power saving
@@ -13,7 +13,7 @@
 // use 2 of interruptible pins among: 0, 1, 4, 5, 6, 7, 8, A1 -or 16-, A2 - or 17
 #define pinSpeed  0     // reed sensor for speed     - yellow wire
 #define pinDir    1     // reed sensor for direction - green wire
-#define pinBattV  A1    // pin to measure Battery voltage 
+#define pinBattV  A5    // pin to measure Battery voltage 
 
 // 
 #define DEBOUNCE_TIME   16       // 16ms (25ms correspond to speed 155km/h=40rps)

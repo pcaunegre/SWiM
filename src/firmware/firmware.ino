@@ -86,9 +86,8 @@ void setup() {
     
   blinkLed(5,200/cpudiv); // blinks 5 times to say power is ok  
 
-  // sendInitSigfoxMessage(); // to send proprietary infos
-  sendPropInfos();
-  delay(5000);
+  // for future: sending proprietary infos at startup
+  // sendPropInfos();    
 
   // install interruptions functions
   attachInterrupt(digitalPinToInterrupt(pinSpeed), isr_speed    , FALLING);
@@ -138,7 +137,6 @@ void takeSample() {
   wd = computeWindDir();
   store_for_stat(ws,wd);
   DebugLogMeas(ws,wd); // only for reading through lcd display or via usb
-//  printArrays();   // debug purpose
   resetSampler();
   if (debugmode) blinkLed(1,100/cpudiv); // debug purpose
   interrupts();
@@ -436,70 +434,71 @@ void set_cpu_speed(int divisor){
 
 
 
-/*
- * function to collect and send a proprietary monitoring infos
- * 
-*/
-void sendPropInfos()  {
-
-  analogReference(AR_INTERNAL1V65); // use internal 1.65 Vref
-  analogReadResolution(12);
-  uint16_t val ; 
-  delay(10);
-  val = 0;
-  for (byte i=0;i<10;i++) {
-      val = val + analogRead(pinBattV);
-      delay(10);
-  }
-  val /= 10; // averaging vbat measure
-  if (lcd_en)  {
-    lcd.setCursor(0,0);
-    lcd.print("                ");
-    lcd.setCursor(0,0);
-    lcd.print(val);lcd.print(" ");
-  } 
-  
-}
-/*
- * function to send a proprietary 12 bits message for monitoring
- * 
-*/
-void sendInitSigfoxMessage() {
-  delay(10);
-  SigFox.begin();
-  delay(100);
-  SigFox.debug();
-  SigFox.status();
-  delay(1);
-  SigFox.beginPacket();
-  
-  // Payload to be defined
-  int a=1; 
-  SigFox.write((uint8_t)a);
-  a=2 ;
-  SigFox.write((uint8_t)a);
-  a=3 ;
-  SigFox.write((uint8_t)a);
-  a=4 ;
-  SigFox.write((uint8_t)a);
-  a=5 ;
-  SigFox.write((uint8_t)a);
-  a=6 ;
-  SigFox.write((uint8_t)a);
-  a=7;
-  SigFox.write((uint8_t)a);
-  a=8 ;
-  SigFox.write((uint8_t)a);
-  a=9 ;
-  SigFox.write((uint8_t)a);
-  a=10 ;
-  SigFox.write((uint8_t)a);
-  a=11 ;
-  SigFox.write((uint8_t)a);
-  a=12 ;
-  SigFox.write((uint8_t)a);
-  
-  int ret = SigFox.endPacket();
-  SigFox.end();
-
-}
+///*
+// * function to collect and send a proprietary monitoring infos
+// * 
+//*/
+//void sendPropInfos()  {
+//
+//  // measure V battery
+//  analogReference(AR_INTERNAL1V65); // use internal 1.65 Vref
+//  analogReadResolution(10);
+//  uint16_t val ; 
+//  delay(10);
+//  val = 0;
+//  for (byte i=0;i<10;i++) {
+//      val = val + analogRead(pinBattV);
+//      delay(10);
+//  }
+//
+//  float vbat = (float)val*1.65/40950; // ADC full range 4095
+//  vbat = vbat*0.9567+0.0063;          // Calibration of ADC
+//  vbat = vbat*3.383;                  // ratio of R divisor
+//  byte vbf = int((vbat-1.5)*100);     // encoding on 1 byte 0:255 for 1.5V:4.05V
+//
+//  // send infos to sigfox
+//  
+//}
+///*
+// * function to send a proprietary 12 bits message for monitoring
+// * 
+//*/
+//void sendInitSigfoxMessage() {
+//  delay(10);
+//  SigFox.begin();
+//  delay(100);
+//  SigFox.debug();
+//  SigFox.status();
+//  delay(1);
+//  SigFox.beginPacket();
+//  
+//  // Payload to be defined
+//  int a=1; 
+//  SigFox.write((uint8_t)a);
+//  a=2 ;
+//  SigFox.write((uint8_t)a);
+//  a=3 ;
+//  SigFox.write((uint8_t)a);
+//  a=4 ;
+//  SigFox.write((uint8_t)a);
+//  a=5 ;
+//  SigFox.write((uint8_t)a);
+//  a=6 ;
+//  SigFox.write((uint8_t)a);
+//  a=7;
+//  SigFox.write((uint8_t)a);
+//  a=8 ;
+//  SigFox.write((uint8_t)a);
+//  a=9 ;
+//  SigFox.write((uint8_t)a);
+//  a=10 ;
+//  SigFox.write((uint8_t)a);
+//  a=11 ;
+//  SigFox.write((uint8_t)a);
+//  a=12 ;
+//  SigFox.write((uint8_t)a);
+//  
+//  int ret = SigFox.endPacket();
+//  SigFox.end();
+//
+//}
