@@ -11,9 +11,9 @@
 
 // Wind Speed & Direction
 // use 2 of interruptible pins among: 0, 1, 4, 5, 6, 7, 8, A1 -or 16-, A2 - or 17
-#define pinSpeed  7     // reed sensor for speed     - yellow wire
-#define pinDir    8     // reed sensor for direction - green wire
-
+#define pinSpeed  0     // reed sensor for speed     - yellow wire
+#define pinDir    1     // reed sensor for direction - green wire
+#define pinBattV  A1    // pin to measure Battery voltage 
 
 // 
 #define DEBOUNCE_TIME   16       // 16ms (25ms correspond to speed 155km/h=40rps)
@@ -23,9 +23,9 @@
 #define SAMPLING_PERIOD 2992     // instantaneous wind is measured on a period of 3s (common rule)
 #define REBOOT_PERIOD   2419200  // reboot micro every 28 days to avoid managing millis reset after 2**32-1 ms
 
-// #define REPORT_PERIOD 600000  // in production, report period is 10min=600s (both the period to avg the wind speed and the sigfox report period)
+#define REPORT_PERIOD 600000  // in production, report period is 10min=600s (both the period to avg the wind speed and the sigfox report period)
 
-#define REPORT_PERIOD 60000 // shorter time for debug: 1min  
+// #define REPORT_PERIOD 60000 // shorter time for debug: 1min  
 
 #define Led LED_BUILTIN 
 

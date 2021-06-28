@@ -2,14 +2,18 @@
 * -- Software for Arduino MKRFox1200 --
 *
 *
-* Purpose: Sigfox Wind AnemoMeter based on Peet Bros. (PRO) anemometer
+* Purpose: Sigfox-connected Wind AnemoMeter based on Peet Bros. (PRO) anemometer
 *          sending data to the OpenWindMap network via Sigfox
-*
+*          
+* Measures available e.g. on https://www.openwindmap.org/PPXXX  
+* Full messages on http://api.pioupiou.fr/v1/sigfox-messages/XXX
+* (replace XXX by the number of your station obtained by a registration to openwindmap)
+* 
 * Peet Bros device uses 2 reed contacts, one for speed, one for wind direction
 * This program reads the wind speed and direction interrupts from two input pins, compute wind
 * and sends data through Sigfox
 *
-* To upload the code onto this board quickly press 2 times the reset button to reset the bootloader
+* To upload the code onto the board press 2 times quickly the reset button to activate the bootloader
 *
 * Pascal Caunegre. pascal.caunegre@gmail.com
 *
@@ -44,6 +48,7 @@ volatile float          acc_wdY       ;  // accumulate wind dir projection on X 
 volatile int            prevWindDir   ;  // memorize the last dir in case we cannot compute new one (speed too low)
 volatile int            statReportCnt ;  // counter : every 2 hits data are sent thru sigfox 
 
+volatile int            cpudiv        ;  // value of cpu freq divisor
 volatile int            lognbr        ;  // number of logs
 volatile int            repnbr        ;  // number of logs
 volatile bool           debugmode     ;  // 1=debug mode
@@ -51,15 +56,17 @@ volatile bool           lcd_en        ;  // lcd plugged or not
 volatile SigfoxWindMessage msg        ;  // create an instance of the struct to receive the wind data frame
 
 // optional display that can be plugged to read values during installation
-LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+LiquidCrystal lcd(9, 8, 5, 4, 3, 2);
 
 void setup() {
 
   // pins to sensor
   pinMode(pinSpeed, INPUT); // yellow wire of Peet Bros cable
   pinMode(pinDir  , INPUT); // green  wire
+  pinMode(Led,     OUTPUT); // led used for debug or at power up
   
   // init variables
+  cpudiv           = CPU_FULL;
   speedLastPulseT  = 0;
   dirLastPulseT    = 0;
   speedHitCnt      = 0;
@@ -76,12 +83,19 @@ void setup() {
   
   // in debug mode we send back logs to the PC in Arduino IDE via Serial
   DebugInit();
-  
+    
+  blinkLed(5,200/cpudiv); // blinks 5 times to say power is ok  
+
+  // sendInitSigfoxMessage(); // to send proprietary infos
+  sendPropInfos();
+  delay(5000);
+
   // install interruptions functions
   attachInterrupt(digitalPinToInterrupt(pinSpeed), isr_speed    , FALLING);
   attachInterrupt(digitalPinToInterrupt(pinDir)  , isr_direction, FALLING);
   
-  cpu_speed(CPU_SLOW);
+  set_cpu_speed(CPU_SLOW);
+  
 }
 
 
@@ -92,17 +106,17 @@ void loop() {
   int    dt2 = now - last_reportT;  // ellapsed time since last report  
   
   // if it's time to sample, get measures and store for stats
-  if (dt1 > SAMPLING_PERIOD/CPU_SLOW) {
+  if (dt1 > SAMPLING_PERIOD/cpudiv) {
     takeSample();
   }
 
   // at every sigfox report period we send 2 packets of data
   // so at every half-report period we store data
-  if (dt2 > (REPORT_PERIOD/2)/CPU_SLOW) {
+  if (dt2 > (REPORT_PERIOD/2)/cpudiv) {
     makeReport();
   }
 
-  if (now > REBOOT_PERIOD/CPU_SLOW) reboot(); // avoid managing millis value wrapping (every 2**32-1 ms)
+  if (now > REBOOT_PERIOD/cpudiv) reboot(); // avoid managing millis value wrapping (every 2**32-1 ms)
 
 
 }
@@ -126,8 +140,8 @@ void takeSample() {
   DebugLogMeas(ws,wd); // only for reading through lcd display or via usb
 //  printArrays();   // debug purpose
   resetSampler();
+  if (debugmode) blinkLed(1,100/cpudiv); // debug purpose
   interrupts();
-  blinkLed(2,100); // debug purpose
     
 }
 /*
@@ -161,11 +175,12 @@ void makeReport() {
     DebugSimSigfoxSend();
     
     // Sigfox call, will require normal cpu rate
-//     noInterrupts();
-//     cpu_speed(CPU_FULL);
-//     sendSigFoxMessage();
-//     cpu_speed(CPU_SLOW);
-//     interrupts();
+    noInterrupts();  // hold on interruptions
+    if (debugmode) blinkLed(3,100/cpudiv);
+    set_cpu_speed(CPU_FULL);
+    sendSigFoxMessage();
+    set_cpu_speed(CPU_SLOW);
+    interrupts();   // resume interruptions
     
     statReportCnt=0;
   } else {
@@ -186,7 +201,7 @@ void isr_speed() {
   int now = millis();
   
   // avoid switch bounce to call this routine multiple times
-  if ((now - speedLastPulseT) < DEBOUNCE_TIME/CPU_SLOW) {
+  if ((now - speedLastPulseT) < DEBOUNCE_TIME/cpudiv) {
     return;
   }
   speedLastPulseT = now; 
@@ -202,7 +217,7 @@ void isr_direction() {
   int now = millis();
   
   // avoid switch bounce to call this routine multiple times
-  if ((now - dirLastPulseT) < DEBOUNCE_TIME/CPU_SLOW) {
+  if ((now - dirLastPulseT) < DEBOUNCE_TIME/cpudiv) {
     return;
   }
   dirLastPulseT = now;   
@@ -246,7 +261,7 @@ int computeWindSpeed() {
   if (speedHitCnt<2) return(0.0);
   
   // rotation per seconds
-  int dt = (speedTimeArray[speedHitCnt-1]-speedTimeArray[0])*CPU_SLOW;
+  int dt = (speedTimeArray[speedHitCnt-1]-speedTimeArray[0])*cpudiv;
   float rps = 1000.0 * (float)(speedHitCnt-1) / (float)dt;
   
   // calibration formulas given by Peet Bros sensor vendor
@@ -376,7 +391,8 @@ int wdir_avg()  {
  *speedMin[0], speedMin[1], speedAvg[0], speedAvg[1], speedMax[0], speedMax[1], dirAvg[0], dirAvg[1]
 */
 void sendSigFoxMessage() {
-  // Start the module
+  // Start the module  
+    
   delay(10);
   SigFox.begin();
 //   if (!SigFox.begin()) {
@@ -385,6 +401,7 @@ void sendSigFoxMessage() {
 //   }
   // Wait at least 30mS after first configuration (100mS before)
   delay(100);
+  SigFox.debug();
 
   // Clears all pending interrupts
   SigFox.status();
@@ -410,8 +427,79 @@ void reboot() {
 /*
  * CPU underclocking: clock is divided by divisor
 */
-void cpu_speed(int divisor){
+void set_cpu_speed(int divisor){
+  cpudiv=divisor;
   GCLK->GENDIV.reg = GCLK_GENDIV_DIV(divisor) |         // Divide the 48MHz clock source by divisor 48: 48MHz/48=1MHz
                    GCLK_GENDIV_ID(0);            // Select Generic Clock (GCLK) 0
   while (GCLK->STATUS.bit.SYNCBUSY);               // Wait for synchronization      
+}
+
+
+
+/*
+ * function to collect and send a proprietary monitoring infos
+ * 
+*/
+void sendPropInfos()  {
+
+  analogReference(AR_INTERNAL1V65); // use internal 1.65 Vref
+  analogReadResolution(12);
+  uint16_t val ; 
+  delay(10);
+  val = 0;
+  for (byte i=0;i<10;i++) {
+      val = val + analogRead(pinBattV);
+      delay(10);
+  }
+  val /= 10; // averaging vbat measure
+  if (lcd_en)  {
+    lcd.setCursor(0,0);
+    lcd.print("                ");
+    lcd.setCursor(0,0);
+    lcd.print(val);lcd.print(" ");
+  } 
+  
+}
+/*
+ * function to send a proprietary 12 bits message for monitoring
+ * 
+*/
+void sendInitSigfoxMessage() {
+  delay(10);
+  SigFox.begin();
+  delay(100);
+  SigFox.debug();
+  SigFox.status();
+  delay(1);
+  SigFox.beginPacket();
+  
+  // Payload to be defined
+  int a=1; 
+  SigFox.write((uint8_t)a);
+  a=2 ;
+  SigFox.write((uint8_t)a);
+  a=3 ;
+  SigFox.write((uint8_t)a);
+  a=4 ;
+  SigFox.write((uint8_t)a);
+  a=5 ;
+  SigFox.write((uint8_t)a);
+  a=6 ;
+  SigFox.write((uint8_t)a);
+  a=7;
+  SigFox.write((uint8_t)a);
+  a=8 ;
+  SigFox.write((uint8_t)a);
+  a=9 ;
+  SigFox.write((uint8_t)a);
+  a=10 ;
+  SigFox.write((uint8_t)a);
+  a=11 ;
+  SigFox.write((uint8_t)a);
+  a=12 ;
+  SigFox.write((uint8_t)a);
+  
+  int ret = SigFox.endPacket();
+  SigFox.end();
+
 }

@@ -8,8 +8,6 @@
 */
 void blinkLed(int times, int period) {
 
-  if (!debugmode) return;
-  
   for (int i=0; i<times; i++ ) {
     digitalWrite(Led,HIGH);
     delay(period);
@@ -30,8 +28,6 @@ void DebugInit( ) {
     lcd.print("Starting 4");
   }
   if(debugmode) {
-    pinMode(Led, OUTPUT);
-    digitalWrite(Led,HIGH); // blinks when starting in debug mode
     blinkLed(3,800/CPU_SLOW);
     Serial.begin(9600);     // 115200
     int waiting=0;
