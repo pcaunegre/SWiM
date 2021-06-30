@@ -6,7 +6,7 @@
 #define LCD   0  // enable output to a lcd display
 
 #define CPU_FULL   1  // normal cpu rate (48Mhz)
-#define CPU_SLOW   16  // divided by 16 so 3Mhz for power saving
+#define CPU_SLOW   16  // divided by 16 so 3Mhz for power saving, so we have ~3mA and a peak of ~45mA during 3s every 10min
 
 
 // Wind Speed & Direction
