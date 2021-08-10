@@ -1,0 +1,43 @@
+About this project:
+===================
+
+OpenWindMap is a network of wind sensors (https://www.openwindmap.org), collecting data from the devices via the Sigfox network.
+
+This project is about to build a device (hardware and software) to process the measurements from a 
+commercial wind sensor and send data via Sigfox messages (8 bits every 10min)
+
+
+The wind sensor (for wind direction and speed) is from Peet Bros (used in Ultimeter weather station)
+
+The core of the project is an Arduino MKRFox1200, using a SAM D21 microcontroler and a sigfox transmitter.
+The device is powered by a small battery (3.7V) and a solar panel.
+Read the doc/bom.txt for a complete list of required parts.
+
+
+In the hardware directory, you will find schematics for connecting parts together.
+(schematics done with Kicad/eeschema)
+
+In src directory, you will find the code to upload on the Arduino card.
+
+
+Follow these steps:
+===================
+
+Once you have completed the hardware:
+
+0/ If not done, install the Arduino IDE on your computer (https://www.arduino.cc/en/software)
+ 
+1/ Launch Arduino IDE and, 
+        -install SAMD boards in the board manager, 
+        -install "Arduino Sigfox for MKR1200" lib from the lib manager
+
+2/ Upload src/board_infos/board_infos.ino code onto the board. It will render the board identifiers (ID and PAC)
+   via the serial monitor. Note these IDs to further register your board on OpenWindMap.
+   
+   (Note: before pushing the Upload button, trigger the bootloader by pressing quickly twice on the reset button)
+
+3/ Upload src/firmware/firmware.ino. This code will actually manage measurements and transmit data.
+
+
+
+by pascal.caunegre@gmail.com
