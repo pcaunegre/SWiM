@@ -3,8 +3,7 @@ About this project:
 
 OpenWindMap is a network of wind sensors (https://www.openwindmap.org), collecting data from the devices via the Sigfox network.
 
-This project is about to build a device (hardware and software) to process the measurements from a 
-commercial wind sensor and send data via Sigfox messages (8 bits every 10min)
+This project is about building a device (hardware and software) to process the measurements from a commercial wind sensor and send data via Sigfox messages (8 bits every 10min)
 
 
 The wind sensor (for wind direction and speed) is from Peet Bros (used in Ultimeter weather station)
@@ -17,7 +16,7 @@ Read the doc/bom.txt for a complete list of required parts.
 In the hardware directory, you will find schematics for connecting parts together.
 (schematics done with Kicad/eeschema)
 
-In src directory, you will find the code to upload on the Arduino card.
+In src directory, you will find the code to upload on the Arduino board.
 
 
 Follow these steps:
