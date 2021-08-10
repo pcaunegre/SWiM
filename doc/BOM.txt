@@ -1,0 +1,21 @@
+Bill of Material				
+==================
+				
+Item	        Ref	            Qty	    Price (E)	Possible Supplier
+--------------------------------------------------------------------------------------------------------------------------------------------
+Sensor	        Peet Bross	    1	    115	        https://www.meteo-shopping.com/fr/capteurs/400-130-anemometre-girouette-pro-12-metres-de-cable.html#/44-type_anemometre-pro
+Board	        MKRFox1201	    1	    40	        https://fr.rs-online.com/web/p/arduino/1697590/
+Antenna	        Antena 868Mhz uFL   1	    4,2	        https://yadom.fr/antenne-filaire-868mhz-ufl.html
+Solar panel	5V, 250mAh	    1	    5	        https://www.amazon.fr/Homyl-Chargeur-Solaire-Batterie-Panneau/dp/B07HFDKWBD
+Mini Charger	Solar Charger V1.0  1	    5	        https://www.robotshop.com/eu/fr/chargeur-batterie-lipo-solaire-37v-500ma.html
+Battery	        Lipo 3.7V 650mAh    1	    5	        https://www.amazon.fr/gp/product/B078HM9L7X
+Plastic Box		            1	    9	        https://www.amazon.fr/SODIAL-electronique-plastique-connexion-impermeable/dp/B01HPRW2L0
+Bridle		                    1		
+Inox Screw                          2	    1		
+Cap 10nF	C 10nF	            2		
+Res 100k	R 100K	            2		
+Zener diode	3.3V	            2		
+Terminal block		            2	    	        https://www.amazon.fr/DECARETA-Bornier-Broches-Circuit-Connecteur/dp/B07PWVW321
+				
+--------------------------------------------------------------------------------------------------------------------------------------------
+TOTAL		                    17	    184,2	
