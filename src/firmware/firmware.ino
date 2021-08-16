@@ -256,7 +256,7 @@ int computeWindSpeed() {
   float mph;
    
   // not enough pulses to compute wind
-  if (speedHitCnt<2) return(0.0);
+  if (speedHitCnt<2) return(-1);
   
   // rotation per seconds
   int dt = (speedTimeArray[speedHitCnt-1]-speedTimeArray[0])*cpudiv;
@@ -329,11 +329,14 @@ int searchElem(int LL, int UL) {
 void store_for_stat(int ws, int wd)  {
   // wind speed in km/h
   // wind dir in degrees
+  // -1 means meas not valid
   
-  if (ws > max_wspeed)  max_wspeed = ws;
-  if (ws < min_wspeed)  min_wspeed = ws;
-  acc_wspeed += ws;
-  cnt_ws_samples++;
+  if (ws>-1)  {
+    if (ws > max_wspeed)  max_wspeed = ws;
+    if (ws < min_wspeed)  min_wspeed = ws;
+    acc_wspeed += ws;
+    cnt_ws_samples++;
+  }
   
   if (wd>-1)  {
     // projection of direction is weighted by the speed
