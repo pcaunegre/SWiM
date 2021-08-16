@@ -149,10 +149,7 @@ void takeSample() {
 */
 void makeReport() {
   
-  unsigned long now = millis();
   int ws, wd;
-  
-  last_reportT = now;
     
   // report the values
   ws = wspeed_avg();
@@ -187,6 +184,10 @@ void makeReport() {
   
   // clear stats
   reset_stat();
+  
+  // reset the clocks
+  last_reportT = millis();
+  last_sampleT = last_reportT;
  
 }
 
