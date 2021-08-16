@@ -38,5 +38,8 @@ Once you have completed the hardware:
 3/ Upload src/firmware/firmware.ino. This code will actually manage measurements and transmit data.
 
 
+4/ Once you have register your board on the OWM network, you get a station ID
+   You will retrieve your data from https://www.openwindmap.org/<ID>
+
 
 by pascal.caunegre@gmail.com
