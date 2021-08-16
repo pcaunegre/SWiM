@@ -10,6 +10,7 @@ Solar panel	5V, 250mA	    1	    5	        https://www.amazon.fr/Homyl-Chargeur-S
 Mini Charger	Solar Charger V1.0  1	    5	        https://www.robotshop.com/eu/fr/chargeur-batterie-lipo-solaire-37v-500ma.html
 Battery	        Lipo 3.7V 650mAh    1	    5	        https://www.amazon.fr/gp/product/B078HM9L7X
 Plastic Box	158x90x60mm         1	    9	        https://www.amazon.fr/SODIAL-electronique-plastique-connexion-impermeable/dp/B01HPRW2L0
+Cable gland                         1       0.25        https://www.amazon.fr/Gebildet-Presse-%C3%A9toupes-Connecteurs-Plastique-dext%C3%A9rieur/dp/B07V9GPP6Z/ref=sr_1_39?__mk_fr_FR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&crid=1S69H8BXLVP5Z&dchild=1&keywords=presse+etoupe&qid=1629121429&sprefix=presse+etou%2Caps%2C241&sr=8-39
 Cap 10nF	C 10nF	            2		
 Res 100k	R 100K	            2		
 Res 1k	        R 1K	            2		
@@ -17,7 +18,8 @@ Schottky diode	1N5818 	            4	    0.5	        https://fr.farnell.com/on-s
 Terminal block		            2	    0.3	        https://www.amazon.fr/DECARETA-Bornier-Broches-Circuit-Connecteur/dp/B07PWVW321
 				
 --------------------------------------------------------------------------------------------------------------------------------------------
-TOTAL		                    19	   ~173.5	
+TOTAL		                    19	   ~174	
+
 
 
 Misc to hook up the box: 
