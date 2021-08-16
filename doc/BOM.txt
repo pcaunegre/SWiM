@@ -4,18 +4,24 @@ Bill of Material
 Item	        Ref	            Qty	    Price (E)	Possible Supplier
 --------------------------------------------------------------------------------------------------------------------------------------------
 Sensor	        Peet Bross	    1	    115	        https://www.meteo-shopping.com/fr/capteurs/400-130-anemometre-girouette-pro-12-metres-de-cable.html#/44-type_anemometre-pro
-Board	        MKRFox1201	    1	    40	        https://fr.rs-online.com/web/p/arduino/1697590/
-Antenna	        Antena 868Mhz uFL   1	    4,2	        https://yadom.fr/antenne-filaire-868mhz-ufl.html
-Solar panel	5V, 250mAh	    1	    5	        https://www.amazon.fr/Homyl-Chargeur-Solaire-Batterie-Panneau/dp/B07HFDKWBD
+Board	        MKRFox1201	    1	    29.50	https://fr.farnell.com/arduino/abx00014/carte-de-dev-mcu-32-bits-arm-cortex/dp/2830994?CMP=KNC-GFR-GEN-KWL-No-Audience-Shared-Budgets-01-Mar-21&mckv=s_dc|pcrid|501692093664|plid||kword||match|b|slid||product||pgrid|106598517051|ptaid|dsa-903234702363|&gclid=EAIaIQobChMIrufsxajl8AIVBZ3VCh35XgyaEAAYASAAEgLRZvD_BwE
+Antenna	        Antena 868Mhz uFL   1	    4.2	        https://fr.farnell.com/molex/105262-0001/antenne-ism-868-915-mhz-100mm/dp/2424206
+Solar panel	5V, 250mA	    1	    5	        https://www.amazon.fr/Homyl-Chargeur-Solaire-Batterie-Panneau/dp/B07HFDKWBD
 Mini Charger	Solar Charger V1.0  1	    5	        https://www.robotshop.com/eu/fr/chargeur-batterie-lipo-solaire-37v-500ma.html
 Battery	        Lipo 3.7V 650mAh    1	    5	        https://www.amazon.fr/gp/product/B078HM9L7X
-Plastic Box		            1	    9	        https://www.amazon.fr/SODIAL-electronique-plastique-connexion-impermeable/dp/B01HPRW2L0
-Bridle		                    1		
-Inox Screw                          2	    1		
+Plastic Box	158x90x60mm         1	    9	        https://www.amazon.fr/SODIAL-electronique-plastique-connexion-impermeable/dp/B01HPRW2L0
 Cap 10nF	C 10nF	            2		
 Res 100k	R 100K	            2		
-Zener diode	3.3V	            2		
-Terminal block		            2	    	        https://www.amazon.fr/DECARETA-Bornier-Broches-Circuit-Connecteur/dp/B07PWVW321
+Res 1k	        R 1K	            2		
+Schottky diode	1N5818 	            4	    0.5	        https://fr.farnell.com/on-semiconductor/1n5818/diode-schottky-1a-30v/dp/1017588?CMP=KNC-GFR-GEN-KWL-No-Audience-Shared-Budgets-01-Mar-21&mckv=s_dc|pcrid|501692093664|plid||kword||match|b|slid||product||pgrid|106598517051|ptaid|dsa-903234702363|&gclid=EAIaIQobChMIw6yiyMat8gIVCdTtCh36sgCMEAAYAyAAEgLf7PD_BwE
+Terminal block		            2	    0.3	        https://www.amazon.fr/DECARETA-Bornier-Broches-Circuit-Connecteur/dp/B07PWVW321
 				
 --------------------------------------------------------------------------------------------------------------------------------------------
-TOTAL		                    17	    184,2	
+TOTAL		                    19	   ~173.5	
+
+
+Misc to hook up the box: 
+------------------------
+Bridle		                    1		
+Inox Screw                          2	    1		
+...
