@@ -385,7 +385,7 @@ Wire Wire Line
 Text Notes 1550 4700 0    50   ~ 0
 U1
 Text Notes 5450 1600 0    100  ~ 0
-We use 100K for external pull-ups (not using internal pull-ups)\nZener diodes for ESD pulses.\n1K to limit current during ESD pulses\n10nF capacitor to debounce signal (better than software debounce)\n
+We use 100K for external pull-ups (not using internal pull-ups)\nSchottky diodes for overvoltages.\n1K to limit current during overvoltage pulses\n10nF capacitor to debounce signal (better than software debounce)\n
 $Comp
 L Diode:1N5818 D2
 U 1 1 6116621C
