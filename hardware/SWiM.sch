@@ -4,10 +4,10 @@ EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 1
-Title "Arduino (sigfox) Wind meter"
-Date "2021-06-29"
-Rev "1.0"
-Comp "pascal.caunegre@free.fr"
+Title "Sigfox-connected (Arduino-based) Wind Meter"
+Date "2021-10-12"
+Rev "1.1"
+Comp "pascal.caunegre@gmail.com"
 Comment1 ""
 Comment2 ""
 Comment3 ""
@@ -38,12 +38,12 @@ $EndComp
 $Comp
 L pspice:CAP C1
 U 1 1 60DB0222
-P 5000 3250
-F 0 "C1" H 5178 3296 50  0000 L CNN
-F 1 "10n" H 5178 3205 50  0000 L CNN
-F 2 "" H 5000 3250 50  0001 C CNN
-F 3 "~" H 5000 3250 50  0001 C CNN
-	1    5000 3250
+P 4350 3250
+F 0 "C1" H 4528 3296 50  0000 L CNN
+F 1 "10n" H 4528 3205 50  0000 L CNN
+F 2 "" H 4350 3250 50  0001 C CNN
+F 3 "~" H 4350 3250 50  0001 C CNN
+	1    4350 3250
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -58,28 +58,14 @@ F 3 "" H 4350 1700 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	4350 3350 4350 3550
-Wire Wire Line
-	4350 3550 5000 3550
-Wire Wire Line
-	5000 3550 5000 3500
-Connection ~ 4350 3550
-Wire Wire Line
-	4350 3550 4350 3600
+	4350 3350 4350 3500
 Wire Wire Line
 	4350 2350 4350 2400
-Wire Wire Line
-	4350 2950 5000 2950
-Wire Wire Line
-	5000 2950 5000 3000
-Connection ~ 4350 2950
-Wire Wire Line
-	4350 2950 4350 3050
 $Comp
-L Device:R R2
+L Device:R R3
 U 1 1 60DBFEF6
 P 5600 2200
-F 0 "R2" H 5670 2246 50  0000 L CNN
+F 0 "R3" H 5670 2246 50  0000 L CNN
 F 1 "100k" H 5670 2155 50  0000 L CNN
 F 2 "" V 5530 2200 50  0001 C CNN
 F 3 "~" H 5600 2200 50  0001 C CNN
@@ -89,35 +75,14 @@ $EndComp
 $Comp
 L pspice:CAP C2
 U 1 1 60DBFEFC
-P 6250 3250
-F 0 "C2" H 6428 3296 50  0000 L CNN
-F 1 "10n" H 6428 3205 50  0000 L CNN
-F 2 "" H 6250 3250 50  0001 C CNN
-F 3 "~" H 6250 3250 50  0001 C CNN
-	1    6250 3250
+P 5600 3300
+F 0 "C2" H 5778 3346 50  0000 L CNN
+F 1 "10n" H 5778 3255 50  0000 L CNN
+F 2 "" H 5600 3300 50  0001 C CNN
+F 3 "~" H 5600 3300 50  0001 C CNN
+	1    5600 3300
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	5600 3350 5600 3550
-Wire Wire Line
-	6250 3550 6250 3500
-Wire Wire Line
-	5600 2350 5600 2650
-Wire Wire Line
-	5600 2950 6250 2950
-Wire Wire Line
-	6250 2950 6250 3000
-Connection ~ 5600 2950
-Wire Wire Line
-	5600 2950 5600 3050
-Wire Wire Line
-	5000 3550 5600 3550
-Connection ~ 5000 3550
-Wire Wire Line
-	5600 3550 6250 3550
-Connection ~ 5600 3550
-Wire Wire Line
-	4350 1850 4750 1850
 Wire Wire Line
 	5600 1850 5600 2050
 Wire Wire Line
@@ -146,8 +111,6 @@ Connection ~ 4350 2400
 Wire Wire Line
 	2550 2750 5600 2750
 Connection ~ 5600 2750
-Wire Wire Line
-	5600 2750 5600 2950
 $Comp
 L Connector:Screw_Terminal_01x03 J1
 U 1 1 60DD2D62
@@ -174,21 +137,10 @@ Wire Wire Line
 	7500 3550 7500 2750
 Wire Wire Line
 	7500 2750 7600 2750
-Wire Wire Line
-	6250 3550 7500 3550
 Connection ~ 6250 3550
-Wire Wire Line
-	7600 2550 6700 2550
 Wire Wire Line
 	4350 2400 4350 2550
 Connection ~ 4350 2550
-Wire Wire Line
-	4350 2550 4350 2950
-Wire Wire Line
-	7600 2650 7100 2650
-Connection ~ 5600 2650
-Wire Wire Line
-	5600 2650 5600 2750
 Text Label 9150 2750 0    50   ~ 0
 Black
 Text Label 9300 2850 0    50   ~ 0
@@ -337,97 +289,142 @@ $EndComp
 Wire Wire Line
 	3900 4150 5750 4150
 Wire Wire Line
-	4750 2050 4750 1850
-Connection ~ 4750 1850
+	5100 2050 5100 1850
 Wire Wire Line
-	4750 1850 5600 1850
+	5100 2350 5100 2550
 Wire Wire Line
-	4750 2350 4750 2550
-Connection ~ 4750 2550
-Wire Wire Line
-	4750 2550 4350 2550
-Wire Wire Line
-	5600 1850 6050 1850
-Wire Wire Line
-	6050 1850 6050 2000
+	6250 1850 6250 2000
 Connection ~ 5600 1850
-Wire Wire Line
-	6050 2300 6050 2650
-Connection ~ 6050 2650
-Wire Wire Line
-	6050 2650 5600 2650
-$Comp
-L Device:R R1
-U 1 1 6113A693
-P 6550 2550
-F 0 "R1" V 6343 2550 50  0000 C CNN
-F 1 "1k" V 6434 2550 50  0000 C CNN
-F 2 "" V 6480 2550 50  0001 C CNN
-F 3 "~" H 6550 2550 50  0001 C CNN
-	1    6550 2550
-	0    1    1    0   
-$EndComp
-Wire Wire Line
-	6400 2550 4750 2550
 $Comp
 L Device:R R2
-U 1 1 611442B6
-P 6950 2650
-F 0 "R2" V 6743 2650 50  0000 C CNN
-F 1 "1k" V 6834 2650 50  0000 C CNN
-F 2 "" V 6880 2650 50  0001 C CNN
-F 3 "~" H 6950 2650 50  0001 C CNN
-	1    6950 2650
+U 1 1 6113A693
+P 4700 2550
+F 0 "R2" V 4493 2550 50  0000 C CNN
+F 1 "1k" V 4584 2550 50  0000 C CNN
+F 2 "" V 4630 2550 50  0001 C CNN
+F 3 "~" H 4700 2550 50  0001 C CNN
+	1    4700 2550
 	0    1    1    0   
 $EndComp
-Wire Wire Line
-	6800 2650 6050 2650
+$Comp
+L Device:R R4
+U 1 1 611442B6
+P 5950 2750
+F 0 "R4" V 6050 2700 50  0000 C CNN
+F 1 "1k" V 6150 2700 50  0000 C CNN
+F 2 "" V 5880 2750 50  0001 C CNN
+F 3 "~" H 5950 2750 50  0001 C CNN
+	1    5950 2750
+	0    1    1    0   
+$EndComp
 Text Notes 1550 4700 0    50   ~ 0
 U1
 Text Notes 5450 1600 0    100  ~ 0
-We use 100K for external pull-ups (not using internal pull-ups)\nSchottky diodes for overvoltages.\n1K to limit current during overvoltage pulses\n10nF capacitor to debounce signal (better than software debounce)\n
+We use 100K for external pull-ups (not using internal pull-ups)\nSchottky diodes to suppress overvoltages.\n1K to limit current during overvoltage pulses\n10nF capacitor to debounce signal (better than software debounce)\n
 $Comp
 L Diode:1N5818 D2
 U 1 1 6116621C
-P 4350 3200
-F 0 "D2" V 4304 3280 50  0000 L CNN
-F 1 "1N5818" V 4395 3280 50  0000 L CNN
-F 2 "Diode_THT:D_DO-41_SOD81_P10.16mm_Horizontal" H 4350 3025 50  0001 C CNN
-F 3 "http://www.vishay.com/docs/88525/1n5817.pdf" H 4350 3200 50  0001 C CNN
-	1    4350 3200
+P 5100 3150
+F 0 "D2" V 5054 3230 50  0000 L CNN
+F 1 "1N5818" V 5145 3230 50  0000 L CNN
+F 2 "Diode_THT:D_DO-41_SOD81_P10.16mm_Horizontal" H 5100 2975 50  0001 C CNN
+F 3 "http://www.vishay.com/docs/88525/1n5817.pdf" H 5100 3150 50  0001 C CNN
+	1    5100 3150
 	0    1    1    0   
 $EndComp
 $Comp
 L Diode:1N5818 D1
 U 1 1 6116D7CA
-P 4750 2200
-F 0 "D1" V 4704 2280 50  0000 L CNN
-F 1 "1N5818" V 4795 2280 50  0000 L CNN
-F 2 "Diode_THT:D_DO-41_SOD81_P10.16mm_Horizontal" H 4750 2025 50  0001 C CNN
-F 3 "http://www.vishay.com/docs/88525/1n5817.pdf" H 4750 2200 50  0001 C CNN
-	1    4750 2200
+P 5100 2200
+F 0 "D1" V 5054 2280 50  0000 L CNN
+F 1 "1N5818" V 5145 2280 50  0000 L CNN
+F 2 "Diode_THT:D_DO-41_SOD81_P10.16mm_Horizontal" H 5100 2025 50  0001 C CNN
+F 3 "http://www.vishay.com/docs/88525/1n5817.pdf" H 5100 2200 50  0001 C CNN
+	1    5100 2200
 	0    1    1    0   
 $EndComp
 $Comp
 L Diode:1N5818 D3
 U 1 1 6116F033
-P 6050 2150
-F 0 "D3" V 6004 2230 50  0000 L CNN
-F 1 "1N5818" V 6095 2230 50  0000 L CNN
-F 2 "Diode_THT:D_DO-41_SOD81_P10.16mm_Horizontal" H 6050 1975 50  0001 C CNN
-F 3 "http://www.vishay.com/docs/88525/1n5817.pdf" H 6050 2150 50  0001 C CNN
-	1    6050 2150
+P 6250 2150
+F 0 "D3" V 6204 2230 50  0000 L CNN
+F 1 "1N5818" V 6295 2230 50  0000 L CNN
+F 2 "Diode_THT:D_DO-41_SOD81_P10.16mm_Horizontal" H 6250 1975 50  0001 C CNN
+F 3 "http://www.vishay.com/docs/88525/1n5817.pdf" H 6250 2150 50  0001 C CNN
+	1    6250 2150
 	0    1    1    0   
 $EndComp
 $Comp
 L Diode:1N5818 D4
 U 1 1 61170E18
-P 5600 3200
-F 0 "D4" V 5554 3280 50  0000 L CNN
-F 1 "1N5818" V 5645 3280 50  0000 L CNN
-F 2 "Diode_THT:D_DO-41_SOD81_P10.16mm_Horizontal" H 5600 3025 50  0001 C CNN
-F 3 "http://www.vishay.com/docs/88525/1n5817.pdf" H 5600 3200 50  0001 C CNN
-	1    5600 3200
+P 6250 3200
+F 0 "D4" V 6204 3280 50  0000 L CNN
+F 1 "1N5818" V 6295 3280 50  0000 L CNN
+F 2 "Diode_THT:D_DO-41_SOD81_P10.16mm_Horizontal" H 6250 3025 50  0001 C CNN
+F 3 "http://www.vishay.com/docs/88525/1n5817.pdf" H 6250 3200 50  0001 C CNN
+	1    6250 3200
 	0    1    1    0   
 $EndComp
+Wire Wire Line
+	4350 1850 5100 1850
+Wire Wire Line
+	4350 2550 4550 2550
+Connection ~ 4350 3000
+Wire Wire Line
+	4350 3000 4350 3050
+Connection ~ 4350 3500
+Wire Wire Line
+	4350 2550 4350 3000
+Connection ~ 5100 1850
+Connection ~ 5100 2550
+Wire Wire Line
+	5100 1850 5600 1850
+Wire Wire Line
+	5100 2550 5100 3000
+Wire Wire Line
+	5100 3300 5100 3550
+Wire Wire Line
+	4350 3500 4350 3550
+Wire Wire Line
+	5100 3550 4350 3550
+Wire Wire Line
+	4350 3550 4350 3600
+Connection ~ 5100 3550
+Connection ~ 4350 3550
+Wire Wire Line
+	4850 2550 5100 2550
+Wire Wire Line
+	5100 2550 7600 2550
+Wire Wire Line
+	5100 3550 5600 3550
+Connection ~ 5600 3550
+Wire Wire Line
+	5600 3550 6250 3550
+Wire Wire Line
+	5600 2750 5600 3050
+Wire Wire Line
+	6250 3550 7500 3550
+Wire Wire Line
+	6250 3500 6250 3550
+Wire Wire Line
+	5600 2750 5800 2750
+Wire Wire Line
+	6250 3350 6250 3550
+Wire Wire Line
+	5600 1850 6250 1850
+Wire Wire Line
+	6100 2750 6250 2750
+Connection ~ 6250 2750
+Wire Wire Line
+	6250 2750 6250 3050
+Wire Wire Line
+	5600 2350 5600 2750
+Wire Wire Line
+	6250 2300 6250 2750
+Wire Wire Line
+	6250 2750 6750 2750
+Wire Wire Line
+	6750 2750 6750 2650
+Wire Wire Line
+	6750 2650 7600 2650
 $EndSCHEMATC
