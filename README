@@ -30,10 +30,12 @@ Once you have completed the hardware:
         -install SAMD boards in the board manager, 
         -install "Arduino Sigfox for MKR1200" lib from the lib manager
 
-2/ Upload src/board_infos/board_infos.ino code onto the board. It will render the board identifiers (ID and PAC)
-   via the serial monitor. Note these IDs to further register your board on OpenWindMap.
+2/ Upload src/board_infos/board_infos.ino code onto the board. 
+   (Note: before pushing the Upload button, trigger the bootloader by pressing quickly twice on the reset button)  
    
-   (Note: before pushing the Upload button, trigger the bootloader by pressing quickly twice on the reset button)
+   This program will render the board identifiers (ID and PAC) via the serial monitor. 
+   Note these IDs to further register your board on OpenWindMap.
+   
 
 3/ Upload src/firmware/firmware.ino. This code will actually manage measurements and transmit data.
 
